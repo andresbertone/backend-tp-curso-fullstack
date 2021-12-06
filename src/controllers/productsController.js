@@ -1,4 +1,7 @@
 const models = require('../models');
+const mongoose = require('mongoose');
+
+const objectIdValidator = mongoose.Types.ObjectId;
 
 const getProducts = async (req, res) => {
     try{
@@ -8,9 +11,9 @@ const getProducts = async (req, res) => {
             data: response,
             error: false
         })
-    }catch(error){
+    } catch (error){
         return res.status(500).json({
-            message: error,
+            msg: error,
             error: true
         });
     }
@@ -19,6 +22,16 @@ const getProducts = async (req, res) => {
 const getProductById = async (req, res) => {
     try {
         const productId = req.params.id;
+
+        const productIdIsValid = objectIdValidator.isValid(productId);
+
+        if (!productIdIsValid) {
+            return res.status(400).json({
+                msg: 'El ID no corresponde con un ID generado por MongoDB',
+                error: true
+            });
+        }
+
         const response = await models.Products.findById(productId);
 
         if (response) {
@@ -27,10 +40,10 @@ const getProductById = async (req, res) => {
                 error: false,
             });
         } else {
-        res.status(404).json({
-            msg: "El producto no existe",
-            error: true,
-        });
+            res.status(404).json({
+                msg: `El producto con ID ${productId} no existe`,
+                error: true,
+            });
         }
     } catch (error) {
         return res.status(500).json({
@@ -42,9 +55,26 @@ const getProductById = async (req, res) => {
 
 const addProduct = async (req, res) => {
     try {
+        if ( !validFields(req.body) ) {
+            return res.status(400).json({
+                msg: 'Faltan datos obligatorios para crear un producto. Verifique que los campos nombre de producto, imagen, precio, stock y proveedor estén completos',
+                error: true,
+            });
+        };
+
+        const idSupplierIsValid = await validIdSupplier(req.body.idSupplier);
+
+        if ( !idSupplierIsValid ) {
+            return res.status(400).json({
+                msg: 'El ID del proveedor no es válido',
+                error: true,
+            });
+        };
+
         const product = new models.Products(req.body);
         await product.save();
-        res.status(200).json({
+
+        res.status(201).json({
             data: product,
             error: false,
         });
@@ -60,12 +90,30 @@ const updateProduct = async (req, res) => {
     try {
         const productId = req.params.id;
 
-        if (!Object.keys(req.body).length) {
-            return res.status(404).json({
-                error: true,
-                msg: "Por favor, inserte los datos necesarios",
+        const productIdIsValid = objectIdValidator.isValid(productId);
+
+        if (!productIdIsValid) {
+            return res.status(400).json({
+                msg: 'El ID no corresponde con un ID generado por MongoDB',
+                error: true
             });
-        }
+        };
+
+        if ( !validFields(req.body) ) {
+            return res.status(400).json({
+                msg: 'Faltan datos obligatorios para modificar el producto. Verifique que los campos nombre de producto, imagen, precio, stock y proveedor estén completos',
+                error: true,
+            });
+        };
+        
+        const idSupplierIsValid = await validIdSupplier(req.body.idSupplier);
+
+        if ( !idSupplierIsValid ) {
+            return res.status(400).json({
+                msg: 'El ID del proveedor no es válido',
+                error: true,
+            });
+        };
 
         const product = await models.Products.findByIdAndUpdate(
             productId,
@@ -76,19 +124,19 @@ const updateProduct = async (req, res) => {
     
         if (product) {
             res.status(200).json({
-                error: false,
                 data: product,
+                error: false,
             });
         } else {
             res.status(404).json({
+                msg: `El producto con ID ${productId} no existe`,
                 error: true,
-                msg: "El producto no existe",
             });
         }
     } catch (error) {
         res.status(500).json({
-            error: true,
             msg: error,
+            error: true,
         });
     }
 };
@@ -97,6 +145,15 @@ const deleteProduct = async (req, res) => {
     try {
         const productId = req.params.id;
 
+        const productIdIsValid = objectIdValidator.isValid(productId);
+
+        if (!productIdIsValid) {
+            return res.status(400).json({
+                msg: 'El ID no corresponde con un ID generado por MongoDB',
+                error: true
+            });
+        };
+
         const productResponse = await models.Products.findByIdAndRemove(
             productId
         );
@@ -104,23 +161,46 @@ const deleteProduct = async (req, res) => {
         if (productResponse) {
 
             res.status(200).json({
+                data: productResponse,
+                msg: `El producto con ID ${productId} fue eliminado exitosamente`,
                 error: false,
-                data: {
-                    product: productResponse,
-                },
-                msg: `El producto con id ${productId} fue eliminado exitosamente`,
             });
         } else {
             res.status(404).json({
+                msg: `El producto con ID ${productId} no existe`,
                 error: true,
-                msg: "El producto no existe",
             });
         }
     } catch (error) {
         res.status(500).json({
-            error: true,
             msg: error,
+            error: true,
         });
+    }
+};
+
+
+const validFields = (body) => {
+    const productName = body.name;
+    const image = body.image;
+    const price = body.price;
+    const stock = body.stock;
+    const supplierId = body.idSupplier;
+
+    if (productName && image && price && stock && supplierId) {
+        return true;
+    } else {
+        return false;
+    }
+};
+
+const validIdSupplier = async (idSupplier) => {
+    const supplier = await models.Suppliers.findById(idSupplier);
+    
+    if (supplier) {
+        return true;
+    } else {
+        return false;
     }
 };
 

@@ -10,17 +10,19 @@ const productSchema = mongoose.Schema({
     },
     image:{
         type: String,
-        required:true
+        required: true
     },
     price:{
         type: Number,
-        required:true
+        required: true
     },
     quotas:{
         type: Number,
+        default: 0
     },
     stock:{
         type: Number,
+        required: true
     },
     idSupplier:{
         type: mongoose.Schema.Types.ObjectId,

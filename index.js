@@ -1,10 +1,13 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const PORT = 3000;
-const MONGO_URL = "";
 const router = require('./src/routes/index.js');
+
+
+const PORT = process.env.PORT || 8080;
+const MONGO_URL = process.env.MONGO_DB_URL;
 
 const app = express();
 
@@ -20,6 +23,7 @@ const connectDb = async () => {
         
         app.listen({port: PORT}, () => {
             console.log(`Server running on port ${PORT}`);
+            console.log(`Server running on: http://localhost:${PORT}/`);
         });
     }catch(error){
         console.log(`Error connecting to database: ${error}`);
