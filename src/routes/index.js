@@ -5,6 +5,6 @@ const suppliersRouter = require ('./suppliersRouter');
 const router = express.Router();
 
 router.use('/products', productsRouter);
-router.use('/proveedores', suppliersRouter);
+router.use('/suppliers', suppliersRouter);
 
 module.exports = router;
