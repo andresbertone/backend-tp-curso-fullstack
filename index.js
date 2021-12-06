@@ -6,8 +6,8 @@ const cors = require('cors');
 const router = require('./src/routes/index.js');
 
 
-const PORT = process.env.PORT || 8080;
-const MONGO_URL = process.env.MONGO_DB_URL;
+const PORT = process.env.PORT || 5000;
+const MONGO_URL = process.env.MONGO_URL;
 
 const app = express();
 
