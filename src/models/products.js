@@ -18,7 +18,7 @@ const productSchema = mongoose.Schema({
     },
     quotas:{
         type: Number,
-        default: 0
+        default: 1
     },
     stock:{
         type: Number,
