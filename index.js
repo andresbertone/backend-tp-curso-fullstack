@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const PORT = 3000;
-const MONGO_URL = "";
+const PORT = process.env.PORT || 5000;
+const MONGO_URL = process.env.MONGO_URL;
 const router = require('./src/routes/index.js');
 
 const app = express();

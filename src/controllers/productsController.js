@@ -43,11 +43,19 @@ const getProductById = async (req, res) => {
 const addProduct = async (req, res) => {
     try {
         const product = new models.Products(req.body);
-        await product.save();
-        res.status(200).json({
-            data: product,
-            error: false,
-        });
+        const supplier = await models.Suppliers.findById(product.idSupplier);
+        if (supplier) {
+            await product.save();
+            res.status(200).json({
+                data: product,
+                error: false,
+            });
+        } else {
+            res.status(404).json({
+                error: true,
+                msg: "El proveedor no existe",
+            });
+        }
     } catch (error) {
         return res.status(500).json({
             msg: error,
