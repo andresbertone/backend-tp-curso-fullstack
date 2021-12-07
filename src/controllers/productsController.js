@@ -4,8 +4,22 @@ const mongoose = require('mongoose');
 const objectIdValidator = mongoose.Types.ObjectId;
 
 const getProducts = async (req, res) => {
-    try{
-        const response = await models.Products.find();
+    try {
+        let response;
+        
+        if ( req.query.name ) {
+            // Búsqueda parcial de productos por nombre dado un string
+            const partialProductName = req.query.name;
+            response = await models.Products.find({
+                name: {
+                    $regex: partialProductName,
+                    $options: 'i'
+                }
+            });
+        } else {
+            response = await models.Products.find();
+        }
+
         
         return res.status(200).json({
             data: response,
