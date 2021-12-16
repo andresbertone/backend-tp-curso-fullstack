@@ -51,18 +51,18 @@ const getProductById = async (req, res) => {
         if (response) {
             res.status(200).json({
                 data: response,
-                error: false,
+                error: false
             });
         } else {
             res.status(404).json({
                 msg: `El producto con ID ${productId} no existe`,
-                error: true,
+                error: true
             });
         }
     } catch (error) {
         return res.status(500).json({
             msg: error,
-            error: true,
+            error: true
         });
     }
 };
@@ -72,7 +72,7 @@ const addProduct = async (req, res) => {
         if ( !validFields(req.body) ) {
             return res.status(400).json({
                 msg: 'Faltan datos obligatorios para crear un producto. Verifique que los campos nombre de producto, imagen, precio, stock y proveedor estén completos',
-                error: true,
+                error: true
             });
         };
 
@@ -81,7 +81,14 @@ const addProduct = async (req, res) => {
         if ( !idSupplierIsValid ) {
             return res.status(400).json({
                 msg: 'El ID del proveedor no es válido',
-                error: true,
+                error: true
+            });
+        };
+
+        if ( !validNumberFields(req.body) ) {
+            return res.status(400).json({
+                msg: 'Los campos numéricos stock, precio y cuotas deben ser números positivos mayores a 0.',
+                error: true
             });
         };
 
@@ -90,12 +97,12 @@ const addProduct = async (req, res) => {
 
         res.status(201).json({
             data: product,
-            error: false,
+            error: false
         });
     } catch (error) {
         return res.status(500).json({
             msg: error,
-            error: true,
+            error: true
         });
     }
 };
@@ -116,7 +123,7 @@ const updateProduct = async (req, res) => {
         if ( !validFields(req.body) ) {
             return res.status(400).json({
                 msg: 'Faltan datos obligatorios para modificar el producto. Verifique que los campos nombre de producto, imagen, precio, stock y proveedor estén completos',
-                error: true,
+                error: true
             });
         };
         
@@ -125,7 +132,14 @@ const updateProduct = async (req, res) => {
         if ( !idSupplierIsValid ) {
             return res.status(400).json({
                 msg: 'El ID del proveedor no es válido',
-                error: true,
+                error: true
+            });
+        };
+
+        if ( !validNumberFields(req.body) ) {
+            return res.status(400).json({
+                msg: 'Los campos numéricos stock, precio y cuotas deben ser números positivos mayores a 0.',
+                error: true
             });
         };
 
@@ -139,18 +153,18 @@ const updateProduct = async (req, res) => {
         if (product) {
             res.status(200).json({
                 data: product,
-                error: false,
+                error: false
             });
         } else {
             res.status(404).json({
                 msg: `El producto con ID ${productId} no existe`,
-                error: true,
+                error: true
             });
         }
     } catch (error) {
         res.status(500).json({
             msg: error,
-            error: true,
+            error: true
         });
     }
 };
@@ -177,18 +191,18 @@ const deleteProduct = async (req, res) => {
             res.status(200).json({
                 data: productResponse,
                 msg: `El producto con ID ${productId} fue eliminado exitosamente`,
-                error: false,
+                error: false
             });
         } else {
             res.status(404).json({
                 msg: `El producto con ID ${productId} no existe`,
-                error: true,
+                error: true
             });
         }
     } catch (error) {
         res.status(500).json({
             msg: error,
-            error: true,
+            error: true
         });
     }
 };
@@ -217,6 +231,14 @@ const validIdSupplier = async (idSupplier) => {
         return false;
     }
 };
+
+const validNumberFields = (body) => {
+    if ( body.stock > 0 && body.price > 0 && ( body.quotas > 0 || body.quotas === undefined ) ) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 module.exports = {
     getProducts,
