@@ -233,7 +233,7 @@ const validIdSupplier = async (idSupplier) => {
 };
 
 const validNumberFields = (body) => {
-    if ( body.stock > 0 && body.price > 0 && ( body.quotas > 0 || body.quotas === undefined ) ) {
+    if ( body.stock >= 0 && body.price >= 0 && ( body.quotas > 0 || body.quotas === undefined ) ) {
         return true;
     } else {
         return false;
